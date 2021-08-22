@@ -1,0 +1,26 @@
+{
+  "name": "matcha",
+  "version": "1.0.0",
+  "description": "dating site",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wailbens/Matcha.git"
+  },
+  "author": "wailbens",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wailbens/Matcha/issues"
+  },
+  "homepage": "https://github.com/wailbens/Matcha#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  }
+}
