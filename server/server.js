@@ -1,6 +1,6 @@
 const   path = require('path')
         express = require('express'),
-        // cors = require('cors'),
+        cors = require('cors'),
         http = require('http'),
         bcrypt = require('bcrypt')
 

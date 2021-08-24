@@ -27,18 +27,17 @@ function getUserScheme(req) {
 }
 
 function validateInputs(userScheme) {
-    if (!userScheme.email)
-        return 0
+    if (!userScheme.email || !userScheme.password || !userScheme.username)
+        return false
+    return true
 }
 
 app.post('/users', async (req, res) => {
     const userScheme = getUserScheme(req)
     var user
 
-    console.log(userScheme)
-
-    if (!userScheme.email || !userScheme.password)
-        return res.status(400).send('Email and password cannot be empty')
+    if (!validateInputs(userScheme))
+        return res.status(400).send('Email, username and password cannot be empty')
     user = await users.find(user => user.email == userScheme.email || user.username == userScheme.username)
     if (user) {
         if (user.email === userScheme.email)
