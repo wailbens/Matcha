@@ -1,52 +1,23 @@
-const path = require('path')
-const express = require('express')
-const http = require('http')
-const bcrypt = require('bcrypt')
+const   path = require('path')
+        express = require('express'),
+        // cors = require('cors'),
+        http = require('http'),
+        bcrypt = require('bcrypt')
+
+
+const app = express()
+
+app.use(express.json())
+// app.use(cors())
+
+app.use(require('./routes.js'))
 
 const PORT = process.env.PORT || 3000
 
-const app = express()
-app.use(express.json())
-
-users = []
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname + '/../client/login.html'))
+http.createServer(app).listen(PORT, (err) => {
+    console.log(`listening on http://127.0.0.1:${PORT}`)
 })
 
-app.get('/users', (req, res) => {
-    res.json(users)
-})
-
-app.post('/users', async (req, res) => {
-    try {
-        const hashedP = await bcrypt.hash(req.body.password, 10)
-        const user = {
-            email: req.body.email,
-            username: req.body.username,
-            first_name: req.body.first_name,
-            last_name: req.body.last_name,
-            password: hashedP
-        }
-        users.push(user)
-        res.status(201).send()
-    } catch {
-        res.status(500).send()
-    }
-})
-
-app.post('/users/login', async (req, res) => {
-    const user = await users.find(user => user.username == req.body.username)
-    
-    if (!user) return res.status(400).send('Invalid')
-    try {
-        if (await bcrypt.compare(req.body.password, user.password)) res.status(200).send('Authenticated')
-        else return res.send('Nope.')
-    } catch {
-        return res.status(500).send('Something went wrong.')
-    }
-})
-
-app.listen(PORT, () => {
-    console.log(`server on ${PORT}`)
-})
+// app.listen(PORT, () => {
+//     console.log(`server on ${PORT}`)
+// })
