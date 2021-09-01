@@ -1,23 +1,15 @@
-const   path = require('path')
-        express = require('express'),
+const   express = require('express'),
         cors = require('cors'),
         http = require('http'),
-        bcrypt = require('bcrypt')
+        bcrypt = require('bcrypt');
 
+const app = express();
 
-const app = express()
+app.use(cors());
+app.use(express.json());
 
-app.use(express.json())
-// app.use(cors())
+app.use(require('./routes.js'));
 
-app.use(require('./routes.js'))
+const port = process.env.PORT || 3000;
 
-const PORT = process.env.PORT || 3000
-
-http.createServer(app).listen(PORT, (err) => {
-    console.log(`listening on http://127.0.0.1:${PORT}`)
-})
-
-// app.listen(PORT, () => {
-//     console.log(`server on ${PORT}`)
-// })
+app.listen(port, () => console.log('Server listening on port ' + port));
