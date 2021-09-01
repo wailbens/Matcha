@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>front</title>
+  </head>
+  <body>
+    <div id="log" >
+    {{err}}
+    <form v-on:submit="log">
+    <input v-model="name" placeholder="username">
+    <input v-model="pass" placeholder="password">
+    <button >submit</button>
+    </form>
+</div>
+<div id="reg" >
+    {{err}}
+    <form v-on:submit="reg">
+    <input v-model="name" placeholder="username">
+    <input v-model="email" placeholder="email">
+    <input v-model="pass" placeholder="password">
+    <button >submit</button>
+    </form>
+</div>
+<div id="users"><div v-for="i in info"><h2>Name: {{i.username}} | Email: {{i.email}}</h2></div></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
