@@ -3,27 +3,49 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mr+Dafoe&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <title>front</title>
   </head>
   <body>
-    <div id="log" >
-    {{err}}
-    <form v-on:submit="log">
-    <input v-model="name" placeholder="username">
-    <input v-model="pass" placeholder="password">
-    <button >submit</button>
-    </form>
-</div>
-<div id="reg" >
-    {{err}}
-    <form v-on:submit="reg">
-    <input v-model="name" placeholder="username">
-    <input v-model="email" placeholder="email">
-    <input v-model="pass" placeholder="password">
-    <button >submit</button>
-    </form>
-</div>
-<div id="users"><div v-for="i in info"><h2>Name: {{i.username}} | Email: {{i.email}}</h2></div></div>
-    <!-- built files will be auto injected -->
+  <div class="cont" id="l">
+      <div id="log">
+      <div id="test"></div>
+        <form v-on:submit="log">
+          <div class="form" id="one">
+          <div class="imgLogo"></div>
+            {{err}}
+            <input v-model="name" placeholder="Email">
+            <input type="password" v-model="pass" placeholder="Password">
+            <button>LOGIN</button>
+            <div class="t"><p class="under">don’t have an account ?</p><p class="swipe" v-on:click="swipeR">create account</p></div>
+          </div>
+        </form>
+      </div>
+    
+    <div class="imgLog"></div>
+  </div>
+  <div class="cont" id="r">
+  <div class="imgReg"></div>
+    <div id="reg" >
+    
+      <form v-on:submit="reg">
+        <div class="form" id="two">
+        <div class="imgLogo"></div>
+          {{err}}
+          <input v-model="name" placeholder="First name">
+          <input  placeholder="Last name">
+          <input v-model="email" placeholder="Email">
+          <input type="password" v-model="pass" placeholder="password">
+          <input type="password" placeholder="Confirm password">
+          <button>REGISTER</button>
+          <div class="t"><p class="under">already have an account ?</p><p class="swipe" v-on:click="swipeL">log in</p></div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- <div id="users"><div v-for="i in info"><h2>Name: {{i.username}} | Email: {{i.email}}</h2></div></div> -->
   </body>
 </html>
