@@ -10,8 +10,26 @@ users = []
 //     res.sendFile(path.join(__dirname + '/../client/login.html'))
 // })
 
-router.get('/users', getUsers);
-router.post('/users', register);
+router.get(
+    '/users',
+    getUsers
+);
+
+router.post(
+    '/users',
+    body('username').custom(value => {
+        
+    }),
+    body('email').isEmail().normalizeEmail(),
+    body("password").isStrongPassword({
+        minLength: 8,
+        minLowercase: 1,
+        minUppercase: 1,
+        minNumbers: 1
+    })
+    .withMessage("Password must be greater than 8 and contain at least one uppercase letter, one lowercase letter, and one number"),
+    register
+);
 
 function getUserScheme(req) {
     var username, email, password
