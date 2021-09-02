@@ -85,21 +85,49 @@ button {
 button:hover {
     cursor: pointer;
     transform: scale(1.05);
-    animation: test 0.5s;
+    animation: color 0.3s;
+    background: rgb(38,0,56);
+    background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 70%, rgba(251,61,190,1) 100%);
 }
 
-@keyframes test {
+  @keyframes color {
     0% {
-      margin-left: -3px;
-    }
-    25% {
-      margin-left: -6px;
-    }
+        margin-left: -3px;
+        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 0%, rgba(251,61,190,1) 100%);
+      }
+    10% {
+        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 7%, rgba(251,61,190,1) 100%);
+      }
+    20% {
+        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 14%, rgba(251,61,190,1) 100%);
+      }
+    30% {
+        margin-left: -6px;
+        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 21%, rgba(251,61,190,1) 100%);
+      }
+    40% {
+        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 28%, rgba(251,61,190,1) 100%);
+      }
     50% {
-      margin-left: 2px;
-    }
+        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 35%, rgba(251,61,190,1) 100%);
+      }
+    60% {
+        margin-left: -8px;
+        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 42%, rgba(251,61,190,1) 100%);
+      }
+    70% {
+        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 49%, rgba(251,61,190,1) 100%);
+      }
+    80% {
+        margin-left: 2px;
+        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 56%, rgba(251,61,190,1) 100%);
+      }
+    90% {
+        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 63%, rgba(251,61,190,1) 100%);
+      }
     100% {
-      margin-left: 0px;
+        margin-left: 0px;
+        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 70%, rgba(251,61,190,1) 100%);
     }
   }
 
@@ -114,14 +142,14 @@ button:hover {
 }
 
 @keyframes scale1 {
-    0% {transform: scale(0);}
+    0% {transform: scale(0); opacity: 0;}
     90% {transform: scale(1.1);}
-    100% {transform: scale(1);}
+    100% {transform: scale(1); opacity: 1;}
 }
 
 @keyframes scale2 {
-    0% {transform: scale(1);}
-    100% {transform: scale(0);}
+    0% {transform: scale(1); opacity: 1;}
+    100% {transform: scale(0); opacity: 0;}
 }
 
 .t {
