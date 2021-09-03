@@ -51,20 +51,56 @@ queryGetPasswordPromise = (email) => {
     });
 }
 
-module.exports = {
-    getUsers: async function(req,res,next) {
-        try {
-            const results = await queryUsersPromise();
-            return res.status(200).send({
-                success: true,
-                data: results
-            });
-        } catch (error) {
-            return res.status(500).send({
-                success: false,
-                error: error.message,
+module.exports = { 
+    isLoggedIn: (req, res, next) => {
+    try {
+        const token = req.headers["x-access-token"];
+        if (!token) {
+            return res.status(403).send({
+                message: "No token provided!"
             });
         }
+        const decoded = jwt.verify(
+            token,
+            secret
+        );
+        req.userData = decoded;
+        next();
+    } catch (err) {
+        return res.status(401).send({
+            msg: 'Your session is not valid!'
+        });
+    }
+    // isLoggedIn: async function(req,res,next) {
+
+    // let token = req.headers["x-access-token"];
+
+    // if (!token) {
+    //     return res.status(403).send({
+    //         message: "No token provided!"
+    //     });
+    // }
+    // console.log(token);
+    // jwt.verify(token, config.secret, (err, decoded) => {
+    //   if (err) {
+    //     return res.status(401).send({
+    //       message: "Unauthorized!"
+    //     });
+    //   }
+    //   req.userId = decoded.id;
+    // });
+        // try {
+        //     const results = await queryUsersPromise();
+        //     return res.status(200).send({
+        //         success: true,
+        //         data: results
+        //     });
+        // } catch (error) {
+        //     return res.status(500).send({
+        //         success: false,
+        //         error: error.message,
+        //     });
+        // }
     },
     register: async function(req, res, next) {
         const errors = validationResult(req);

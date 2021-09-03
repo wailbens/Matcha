@@ -1,15 +1,16 @@
 const router = require('express').Router();
 const {check} = require('express-validator');
-const {getUsers, register, login} = require('../controllers/user.controller');
+const controller = require('../controllers/user.controller');
+const auth = require('../_middleware/auth');
 
 var loginValidate = [
-    check('email', 'Email Must Be a valid Email Address').isEmail(),
+    check('email', 'Invalid Email').isEmail(),
 ];
 
 var registerValidate = [
-    check('first_name', 'First Name can\'t be empty').not().isEmpty(),
-    check('last_name', 'Last Name can\'t be empty').not().isEmpty(),
-    check('email', 'Email Must Be a valid Email Address').isEmail().normalizeEmail(),
+    check('first_name', 'All fields are required').not().isEmpty(),
+    check('last_name', 'All fields are required').not().isEmpty(),
+    check('email', 'Invalid Email').isEmail().normalizeEmail(),
     check('password').isLength({ min: 6 })
     .withMessage('Password Must Be at Least 6 Characters')
     .matches('[0-9]').withMessage('Password Must Contain a Number')
@@ -18,19 +19,23 @@ var registerValidate = [
 
 router.get(
     '/users',
-    getUsers
+    controller.isLoggedIn,
+    (req, res, next) => {
+        console.log(req.userData);
+        res.send('This is the secret content. Only logged in users can see that!');
+    }
 );
 
 router.post(
     '/users',
     registerValidate,
-    register
+    controller.register
 );
 
 router.post(
     '/users/login',
     loginValidate,
-    login
+    controller.login
 );
 
 module.exports = router;
