@@ -16,9 +16,9 @@
         <form v-on:submit="log">
           <div class="form" id="one">
           <div class="imgLogo"></div>
-            {{err}}
-            <input v-model="name" placeholder="Email">
-            <input type="password" v-model="pass" placeholder="Password">
+          <div class="errors" id="logErr" >{{err}}</div>
+            <input type="email" v-model="email" id="logMail" placeholder="Email">
+            <input type="password" v-model="pass" id="logPass" placeholder="Password">
             <button>LOGIN</button>
             <div class="t"><p class="under">don’t have an account ?</p><p class="swipe" v-on:click="swipeR">create account</p></div>
           </div>
@@ -30,16 +30,20 @@
   <div class="cont" id="r">
   <div class="imgReg"></div>
     <div id="reg" >
-    
       <form v-on:submit="reg">
         <div class="form" id="two">
         <div class="imgLogo"></div>
-          {{err}}
-          <input v-model="name" placeholder="First name">
-          <input  placeholder="Last name">
-          <input v-model="email" placeholder="Email">
-          <input type="password" v-model="pass" placeholder="password">
-          <input type="password" placeholder="Confirm password">
+        <div class="errors" id="all">All fields are required</div>
+          <input v-model="fName"  id="fName" placeholder="First name">
+          <div class="errors" id="first_name">only alphabetical characters ( a-z  A-Z )</div>
+          <input v-model="lName" id="lName" placeholder="Last name">
+          <div class="errors" id="last_name">only alphabetical characters ( a-z  A-Z )</div>
+          <input v-model="email" id="email" placeholder="Email">
+          <div class="errors" id="mail">Invalid email format</div>
+          <input type="password" v-model="pass" id="password" placeholder="Password">
+          <div class="errors" id="pass"></div>
+          <input type="password" v-model="cPass" id="cpass" placeholder="Confirm password">
+          <div class="errors" id="cPass">Passwords do not match</div>
           <button>REGISTER</button>
           <div class="t"><p class="under">already have an account ?</p><p class="swipe" v-on:click="swipeL">log in</p></div>
         </div>

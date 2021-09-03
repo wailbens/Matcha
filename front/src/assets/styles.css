@@ -87,47 +87,70 @@ button:hover {
     transform: scale(1.05);
     animation: color 0.3s;
     background: rgb(38,0,56);
-    background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 70%, rgba(251,61,190,1) 100%);
+    background: linear-gradient(163deg, rgba(167,72,255,1) 0%, rgba(251,61,190,1) 30%, rgba(251,61,190,1) 100%);
 }
+
+    @keyframes error {
+        0% {
+            border: solid 1px red;
+            margin-left: 0px;
+        }
+        5% {
+            border: solid 1px red;
+            margin-left: -6px;
+        }
+        40% {
+            border: solid 1px red;
+            margin-left: -16px;
+        }
+        80% {
+            border: solid 1px red;
+            margin-left: 4px;
+        }
+        100% {
+            border: solid 1px red;
+            margin-left: 0px;
+        }
+    }
 
   @keyframes color {
     0% {
         margin-left: -3px;
-        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 0%, rgba(251,61,190,1) 100%);
+        background: linear-gradient(163deg, rgba(167,72,255,1) 0%, rgba(251,61,190,1) 0%, rgba(251,61,190,1) 100%);
       }
     10% {
-        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 7%, rgba(251,61,190,1) 100%);
+        background: linear-gradient(163deg, rgba(167,72,255,1) 0%, rgba(251,61,190,1) 3%, rgba(251,61,190,1) 100%);
       }
     20% {
-        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 14%, rgba(251,61,190,1) 100%);
+        background: linear-gradient(163deg, rgba(167,72,255,1) 0%, rgba(251,61,190,1) 6%, rgba(251,61,190,1) 100%);
       }
     30% {
         margin-left: -6px;
-        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 21%, rgba(251,61,190,1) 100%);
+        background: linear-gradient(163deg, rgba(167,72,255,1) 0%, rgba(251,61,190,1) 9%, rgba(251,61,190,1) 100%);
       }
     40% {
-        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 28%, rgba(251,61,190,1) 100%);
+        background: linear-gradient(163deg, rgba(167,72,255,1) 0%, rgba(251,61,190,1) 12%, rgba(251,61,190,1) 100%);
       }
     50% {
-        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 35%, rgba(251,61,190,1) 100%);
+        background: linear-gradient(163deg, rgba(167,72,255,1) 0%, rgba(251,61,190,1) 15%, rgba(251,61,190,1) 100%);
       }
     60% {
         margin-left: -8px;
-        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 42%, rgba(251,61,190,1) 100%);
+        background: linear-gradient(163deg, rgba(167,72,255,1) 0%, rgba(251,61,190,1) 18%, rgba(251,61,190,1) 100%);
       }
     70% {
-        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 49%, rgba(251,61,190,1) 100%);
+        background: linear-gradient(163deg, rgba(167,72,255,1) 0%, rgba(251,61,190,1) 21%, rgba(251,61,190,1) 100%);
       }
     80% {
         margin-left: 2px;
-        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 56%, rgba(251,61,190,1) 100%);
+        background: linear-gradient(163deg, rgba(167,72,255,1) 0%, rgba(251,61,190,1) 24%, rgba(251,61,190,1) 100%);
       }
     90% {
-        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 63%, rgba(251,61,190,1) 100%);
+        background: linear-gradient(163deg, rgba(167,72,255,1) 0%, rgba(251,61,190,1) 27%, rgba(251,61,190,1) 100%);
       }
     100% {
         margin-left: 0px;
-        background: linear-gradient(163deg, rgba(102,68,255,1) 0%, rgba(251,61,190,1) 70%, rgba(251,61,190,1) 100%);
+        background: linear-gradient(163deg, rgba(167,72,255,1) 0%, rgba(251,61,190,1) 30%, rgba(251,61,190,1) 100%);
     }
   }
 
@@ -203,4 +226,35 @@ button:hover {
     background-position: center; 
     background-repeat: no-repeat;
     background-size: cover;
+}
+
+.errors {
+    font-family: 'telegraf';
+    text-align: center;
+    font-size: 18px;
+    border-radius: 8px;
+    width: 100%;
+    color: red;
+    line-height: 20px;
+    margin-top: -15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    
+    display:none;
+}
+
+
+.errors p {
+    line-height: 20px;
+    padding: 0;
+    margin: 0;
+}
+
+.errors:first-child {
+    margin-top: 20px;
+}
+
+.errors:last-child {
+    margin-bottom: 20px;
 }
