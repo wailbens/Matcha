@@ -1,8 +1,10 @@
 const { response } = require("express");
-const pool = require("../_helpers/db");
-const connection = require("../_helpers/db")
+const pool = require("../_helpers/db.config");
+const connection = require("../_helpers/db.config")
 const {validationResult} = require('express-validator');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const secret = require('../config.json').secret;
 
 queryUsersPromise = () => {
     return new Promise((resolve, reject) => {
@@ -58,7 +60,7 @@ module.exports = {
                 data: results
             });
         } catch (error) {
-            return res.status(400).send({
+            return res.status(500).send({
                 success: false,
                 error: error.message,
             });
@@ -75,7 +77,7 @@ module.exports = {
         if (results.length > 0) {
             return res.status(422).json({
                 success: false,
-                message: 'Email already exists',
+                message: 'Email already in use',
             });
         }
         const bcryptPass = await bcrypt.hash(req.body.password, 10);
@@ -87,9 +89,8 @@ module.exports = {
                 message: 'Registration successful',
             });
         } catch (error) {
-            return res.status(400).send({
+            return res.status(500).send({
                 success: false,
-                message: 'Registration failed',
                 error: error.message
             });
         }
@@ -116,15 +117,23 @@ module.exports = {
                     message: "Incorrect password",
                 });
             }
+            const tk = jwt.sign(
+                {
+                    id:results[0].id},
+                    secret,
+                    { expiresIn: 86400
+                }
+            );
             return res.status(200).json({
                 success: true,
                 message: 'Login successful',
-                id: results[0].id
+                id: results[0].id,
+                email: results[0].email,
+                accessToken: tk
             });
         } catch (error) {
-            return res.status(400).send({
+            return res.status(500).send({
                 success: true,
-                message: 'Login failed',
                 error: error.message
             });
         }
