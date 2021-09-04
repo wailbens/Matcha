@@ -4,7 +4,26 @@ const connection = require("../_helpers/db.config")
 const {validationResult} = require('express-validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const secret = require('../config.json').secret;
+// const createToken = require('../_helpers/auth.config');
+// const middleware = require('../_middleware/auth')
+const config = require("../_helpers/auth.config.js");
+const { v4: uuidv4 } = require("uuid");
+
+function createToken(userId) {
+    let expiredAt = new Date();
+  
+    expiredAt.setSeconds(expiredAt.getSeconds() + config.jwtRefreshExpiration);
+  
+    let _token = uuidv4();
+  
+    let refreshToken = {
+      token: _token,
+      userId: userId,
+      expiryDate: expiredAt.getTime(),
+    };
+  
+    return refreshToken.token;
+  }
 
 queryUsersPromise = () => {
     return new Promise((resolve, reject) => {
@@ -53,54 +72,24 @@ queryGetPasswordPromise = (email) => {
 
 module.exports = { 
     isLoggedIn: (req, res, next) => {
-    try {
-        const token = req.headers["x-access-token"];
-        if (!token) {
-            return res.status(403).send({
-                message: "No token provided!"
+        try {
+            const token = req.headers["x-access-token"];
+            if (!token) {
+                return res.status(403).send({
+                    message: "No token provided!"
+                });
+            }
+            const decoded = jwt.verify(
+                token,
+                config.secret
+            );
+            req.userData = decoded;
+            next();
+        } catch (err) {
+            return res.status(401).send({
+                msg: 'Your session is not valid!'
             });
         }
-        const decoded = jwt.verify(
-            token,
-            secret
-        );
-        req.userData = decoded;
-        next();
-    } catch (err) {
-        return res.status(401).send({
-            msg: 'Your session is not valid!'
-        });
-    }
-    // isLoggedIn: async function(req,res,next) {
-
-    // let token = req.headers["x-access-token"];
-
-    // if (!token) {
-    //     return res.status(403).send({
-    //         message: "No token provided!"
-    //     });
-    // }
-    // console.log(token);
-    // jwt.verify(token, config.secret, (err, decoded) => {
-    //   if (err) {
-    //     return res.status(401).send({
-    //       message: "Unauthorized!"
-    //     });
-    //   }
-    //   req.userId = decoded.id;
-    // });
-        // try {
-        //     const results = await queryUsersPromise();
-        //     return res.status(200).send({
-        //         success: true,
-        //         data: results
-        //     });
-        // } catch (error) {
-        //     return res.status(500).send({
-        //         success: false,
-        //         error: error.message,
-        //     });
-        // }
     },
     register: async function(req, res, next) {
         const errors = validationResult(req);
@@ -140,36 +129,36 @@ module.exports = {
             const results = await queryFindByEmailPromise(req.body.email);
             // console.log(results);
             if (results.length == 0) {
-                return res.status(422).json({
+                return res.status(404).json({
                     success: false,
-                    message: 'Invalid Email',
+                    message: 'User not found.',
                 });
             }
             const hashedP = results[0].password;
             const bcryptPassMatch = await bcrypt.compare(req.body.password, hashedP);
             if(!bcryptPassMatch){
-                return res.status(422).json({
-                    success: false,
-                    message: "Incorrect password",
+                return res.status(401).send({
+                    accessToken: null,
+                    message: "Invalid Password!"
                 });
             }
-            const tk = jwt.sign(
+            const accessToken = jwt.sign(
                 {
                     id:results[0].id},
-                    secret,
-                    { expiresIn: 86400
+                    config.secret,{
+                        expiresIn: config.jwtExpiration
                 }
             );
+            refreshToken = createToken(results[0].id);
             return res.status(200).json({
-                success: true,
                 message: 'Login successful',
                 id: results[0].id,
                 email: results[0].email,
-                accessToken: tk
+                accessToken: accessToken,
+                refreshToken: refreshToken,
             });
         } catch (error) {
             return res.status(500).send({
-                success: true,
                 error: error.message
             });
         }
