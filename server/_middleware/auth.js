@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const config = require("../_helpers/auth.config.js");
 const { TokenExpiredError } = jwt;
-// const { v4: uuidv4 } = require("uuid");
+const { v4: uuidv4 } = require("uuid");
 
 module.exports = {
   createToken: function (userId) {

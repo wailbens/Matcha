@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const {check} = require('express-validator');
+const { isLoggedIn } = require('../controllers/user.controller');
 const controller = require('../controllers/user.controller');
 const auth = require('../_middleware/auth');
 
@@ -17,13 +18,16 @@ var registerValidate = [
     .matches('[A-Z]').withMessage('Password Must Contain an Uppercase Letter')
 ];
 
+router.post(
+    '/profile',
+    controller.isLoggedIn,
+    controller.profile
+)
+
 router.get(
     '/users',
     controller.isLoggedIn,
-    (req, res, next) => {
-        console.log(req.userData);
-        res.send('This is the secret content. Only logged in users can see that!');
-    }
+    controller.getUsers
 );
 
 router.post(

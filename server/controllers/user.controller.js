@@ -4,30 +4,31 @@ const connection = require("../_helpers/db.config")
 const {validationResult} = require('express-validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-// const createToken = require('../_helpers/auth.config');
+const { createToken } = require('../_middleware/auth');
 // const middleware = require('../_middleware/auth')
 const config = require("../_helpers/auth.config.js");
-const { v4: uuidv4 } = require("uuid");
+const sendEmail = require("../_helpers/send-email");
+// const { v4: uuidv4 } = require("uuid");
 
-function createToken(userId) {
-    let expiredAt = new Date();
+// function createToken(userId) {
+//     let expiredAt = new Date();
   
-    expiredAt.setSeconds(expiredAt.getSeconds() + config.jwtRefreshExpiration);
+//     expiredAt.setSeconds(expiredAt.getSeconds() + config.jwtRefreshExpiration);
   
-    let _token = uuidv4();
+//     let _token = uuidv4();
   
-    let refreshToken = {
-      token: _token,
-      userId: userId,
-      expiryDate: expiredAt.getTime(),
-    };
+//     let refreshToken = {
+//       token: _token,
+//       userId: userId,
+//       expiryDate: expiredAt.getTime(),
+//     };
   
-    return refreshToken.token;
-  }
+//     return refreshToken.token;
+// }
 
 queryUsersPromise = () => {
     return new Promise((resolve, reject) => {
-        pool.query('SELECT email, username, password FROM `users`', (error, results) => {
+        pool.query('SELECT * FROM `users`', (error, results) => {
             if (error) {
                 return reject(error);
             }
@@ -36,7 +37,7 @@ queryUsersPromise = () => {
     });
 }
 
-queryInsertPromise = (first, last, username, email, password) => {
+queryInsertPromise = (first, last, email, password) => {
     // console.log(username, email, password);
     return new Promise((resolve, reject) => {
         pool.query(`INSERT INTO users (first_name, last_name, email, password) VALUES ('${first}', '${last}', '${email}', '${password}')`, (error, results) => {
@@ -70,7 +71,82 @@ queryGetPasswordPromise = (email) => {
     });
 }
 
-module.exports = { 
+queryInsertProfilePromise = (userId, username, birthday, sexe, gender_interest, about) => {
+    // console.log(username, email, password);
+    return new Promise((resolve, reject) => {
+        pool.query(`UPDATE users set username='${username}', birthday='${birthday}', sexe='${sexe}', gender_interest='${gender_interest}', about='${about}'  WHERE id = ${userId}`, (error, results) => {
+            if (error) {
+                return reject(error);
+            }
+            return resolve(results);
+        })
+    });
+}
+
+queryGetInterestIdPromise = (userId, interest_name) => {
+    console.log(interest_name);
+    return new Promise((resolve, reject) => {
+        pool.query(`SELECT id FROM interests WHERE name='${interest_name}'`, (error, results) => {
+            if (error) {
+                return reject(error);
+            }
+            return resolve(results);
+        })
+    });
+}
+
+queryInsertInterestPromise = (user_id, interest_id) => {
+    // console.log(username, email, password);
+    return new Promise((resolve, reject) => {
+        pool.query(`INSERT INTO user_interests (user_id, interest_id) VALUES ('${user_id}', '${interest_id}')`, (error, results) => {
+            if (error) {
+                return reject(error);
+            }
+            return resolve(results);
+        })
+    });
+}
+
+module.exports = {
+    profile: async function(req, res, next) {
+        try {
+            // console.log(req.body.username)
+            const token = req.headers["x-access-token"];
+            const decoded = jwt.verify(token, config.secret);  
+            var userId = decoded.id;
+            console.log(userId, token);
+            const results = await queryInsertProfilePromise(userId, req.body.username, req.body.birthday, req.body.sexe, req.body.gender_interest, req.body.about);
+            const interest_id = await queryGetInterestIdPromise(userId, req.body.interests);
+            console.log(interest_id)
+            const user_interest = await queryInsertInterestPromise(userId, interest_id[0].id);
+            return res.status(201).json({
+                success: true,
+                message: 'Profile info added',
+            });
+        } catch (error) {
+            return res.status(500).send({
+                success: false,
+                error: error.message
+            });
+        }
+    },
+    verifyEmail: function(req, res, next) {
+        
+    },
+    getUsers: async function(req, res, next) {
+        console.log("re");
+        try {
+            const results = await queryUsersPromise();
+            return res.status(200).send({
+                success: true,
+                users: results,
+            });
+        } catch (err) {
+            return res.status(500).send({
+                error: err.message
+            });
+        }
+    },
     isLoggedIn: (req, res, next) => {
         try {
             const token = req.headers["x-access-token"];
@@ -108,10 +184,11 @@ module.exports = {
         const bcryptPass = await bcrypt.hash(req.body.password, 10);
         try {
             // console.log(req.body.username)
-            const results = await queryInsertPromise(req.body.first_name, req.body.last_name, req.body.username, req.body.email, bcryptPass);
+            const results = await queryInsertPromise(req.body.first_name, req.body.last_name, req.body.email, bcryptPass);
+            // sendEmail(req.body.email);
             return res.status(201).json({
                 success: true,
-                message: 'Registration successful',
+                message: 'Registration successful, check your email for verification',
             });
         } catch (error) {
             return res.status(500).send({
