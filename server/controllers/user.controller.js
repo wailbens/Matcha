@@ -76,6 +76,7 @@ queryInsertProfilePromise = (userId, username, birthday, sexe, gender_interest, 
     return new Promise((resolve, reject) => {
         pool.query(`UPDATE users set username='${username}', birthday='${birthday}', sexe='${sexe}', gender_interest='${gender_interest}', about='${about}'  WHERE id = ${userId}`, (error, results) => {
             if (error) {
+                console.log(error);
                 return reject(error);
             }
             return resolve(results);
@@ -107,18 +108,91 @@ queryInsertInterestPromise = (user_id, interest_id) => {
     });
 }
 
+queryGetUserPromise = (userId) => {
+    return new Promise((resolve, reject) => {
+        pool.query(`SELECT * FROM users WHERE id='${userId}'`, (error, results) => {
+            if (error) {
+                return reject(error);
+            }
+            return resolve(results);
+        })
+    });
+}
+
+queryGetInterestPromise = (userId) => {
+    return new Promise((resolve, reject) => {
+        pool.query(
+            `SELECT name from interests where id in (SELECT interest_id FROM user_interests WHERE user_id='${userId}')`,
+            (error, results) => {
+            if (error) {
+                return reject(error);
+            }
+            return resolve(results);
+        })
+    });
+}
+
+queryGetUserByUsername = (username) => {
+    return new Promise((resolve, reject) => {
+        pool.query(`SELECT * FROM users WHERE username='${username}'`, (error, results) => {
+            if (error) {
+                return reject(error);
+            }
+            return resolve(results);
+        })
+    });
+}
+
 module.exports = {
-    profile: async function(req, res, next) {
+    usernameExists: async function(req, res, next) {
+        const query_res = await queryGetUserByUsername(req.params.username);
+        var exists = false;
+        console.log(query_res, req.params.username)
+        if (query_res.length > 0)
+            exists = true;
+        return res.status(200).json({
+            username: req.params.username,
+            exists: exists
+        });
+    },
+    getProfile: async function(req, res, next) {
         try {
-            // console.log(req.body.username)
+            console.log(req.body.username)
             const token = req.headers["x-access-token"];
             const decoded = jwt.verify(token, config.secret);  
             var userId = decoded.id;
-            console.log(userId, token);
+            // console.log(userId, token);
+            const user = await queryGetUserPromise(userId);
+            // console.log(results);
+            const interests = await queryGetInterestPromise(userId);
+            // console.log("user_interest")
+            return res.status(201).json({
+                success: true,
+                user: user,
+                interests: interests
+            });
+        } catch (error) {
+            return res.status(500).send({
+                success: false,
+                error: error.message
+            });
+        }
+    },
+    postProfile: async function(req, res, next) {
+        try {
+            console.log(req.body.username)
+            const token = req.headers["x-access-token"];
+            const decoded = jwt.verify(token, config.secret);  
+            var userId = decoded.id;
+            // console.log(userId, token);
             const results = await queryInsertProfilePromise(userId, req.body.username, req.body.birthday, req.body.sexe, req.body.gender_interest, req.body.about);
-            const interest_id = await queryGetInterestIdPromise(userId, req.body.interests);
-            console.log(interest_id)
-            const user_interest = await queryInsertInterestPromise(userId, interest_id[0].id);
+            // console.log(results);
+            for (var i = 0; i < req.body.interests.length; i++)
+            {
+                const interest_id = await queryGetInterestIdPromise(userId, req.body.interests[i]);
+                const user_interest = await queryInsertInterestPromise(userId, interest_id[i].id);
+                
+            }
             return res.status(201).json({
                 success: true,
                 message: 'Profile info added',
