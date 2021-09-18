@@ -76,7 +76,7 @@ queryInsertProfilePromise = (userId, username, birthday, sexe, gender_interest, 
     return new Promise((resolve, reject) => {
         pool.query(`UPDATE users set username='${username}', birthday='${birthday}', sexe='${sexe}', gender_interest='${gender_interest}', about='${about}'  WHERE id = ${userId}`, (error, results) => {
             if (error) {
-                console.log(error);
+                // console.log(error);
                 return reject(error);
             }
             return resolve(results);
@@ -85,7 +85,7 @@ queryInsertProfilePromise = (userId, username, birthday, sexe, gender_interest, 
 }
 
 queryGetInterestIdPromise = (userId, interest_name) => {
-    console.log(interest_name);
+    // console.log(interest_name);
     return new Promise((resolve, reject) => {
         pool.query(`SELECT id FROM interests WHERE name='${interest_name}'`, (error, results) => {
             if (error) {
@@ -143,11 +143,180 @@ queryGetUserByUsername = (username) => {
     });
 }
 
+queryUpdateFieldPromise = (userId, value, field) => {
+    return new Promise((resolve, reject) => {
+        pool.query(`UPDATE users set ${field}='${value}' WHERE id = ${userId}`, (error, results) => {
+            if (error) {
+                console.log(error);
+                return reject(error);
+            }
+            return resolve(results);
+        })
+    });
+}
+
+queryGetPotentialMatchesPromise = (userId) => {
+    return new Promise((resolve, reject) => {
+        pool.query(
+            `SELECT DISTINCT user_id from user_interests where interest_id in (SELECT interest_id FROM user_interests WHERE user_id='${userId}')`,
+            (error, results) => {
+            if (error) {
+                return reject(error);
+            }
+            return resolve(results);
+        })
+    });
+}
+
+queryGetByInterestsPromise = (name) => {
+    return new Promise((resolve, reject) => {
+        pool.query(
+            `SELECT DISTINCT user_id from user_interests where interest_id in (SELECT id FROM interests WHERE name='${name}')`,
+            (error, results) => {
+            if (error) {
+                return reject(error);
+            }
+            return resolve(results);
+        })
+    });
+}
+
 module.exports = {
+    getProfileById: async function(req, res, next) {
+        try {
+            var userId = req.params.id;
+            const user = await queryGetUserPromise(userId);
+            const interests = await queryGetInterestPromise(userId);
+            return res.status(200).json({
+                success: true,
+                interests: interests,
+            });
+        } catch (error) {
+            return res.status(500).send({
+                success: false,
+                error: error.message
+            });
+        }
+    },
+    getByInterests: async function(req, res, next) {
+        try {
+            const token = req.headers["x-access-token"];
+            const decoded = jwt.verify(token, config.secret);  
+            var interestName = req.params.interest;
+            const matches = await queryGetByInterestsPromise(interestName);
+            var potentialMatches = [];
+            for (var id of matches)
+            {
+                try {
+                    var user = await queryGetUserPromise(id.user_id);
+                    var interests = await queryGetInterestPromise(id.user_id);
+                    var output = {
+                        "user": user[0],
+                        "interests": interests
+                    }
+                    potentialMatches.push(output);
+                } catch (error) {
+                    return res.status(500).send({
+                        success: false,
+                        error: error.message
+                    });
+                }
+            }
+            // const interests = await queryGetInterestPromise(userId);
+            return res.status(201).json({
+                success: true,
+                potentialMatches: potentialMatches
+            });
+        } catch (error) {
+            return res.status(500).send({
+                success: false,
+                error: error.message
+            });
+        }
+    },
+    getPotentialMatches: async function(req, res, next) {
+        try {
+            const token = req.headers["x-access-token"];
+            const decoded = jwt.verify(token, config.secret);  
+            var userId = decoded.id;
+            const matches = await queryGetPotentialMatchesPromise(userId);
+            var potentialMatches = [];
+            for (var id of matches)
+            {
+                try {
+                    var user = await queryGetUserPromise(id.user_id);
+                    var interests = await queryGetInterestPromise(id.user_id);
+                    var output = {
+                        "user": user[0],
+                        "interests": interests
+                    }
+                    potentialMatches.push(output);
+                } catch (error) {
+                    return res.status(500).send({
+                        success: false,
+                        error: error.message
+                    });
+                }
+            }
+            // const interests = await queryGetInterestPromise(userId);
+            return res.status(201).json({
+                success: true,
+                potentialMatches: potentialMatches
+            });
+        } catch (error) {
+            return res.status(500).send({
+                success: false,
+                error: error.message
+            });
+        }
+    },
+    updateProfile: async function(req, res, next) {
+        try {
+            const token = req.headers["x-access-token"];
+            const decoded = jwt.verify(token, config.secret);  
+            var userId = decoded.id;
+            if (req.body.username)
+            {
+                let results = await queryUpdateFieldPromise(userId, req.body.username, "username");
+            }
+            if (req.body.about)
+            {
+                let results = await queryUpdateFieldPromise(userId, req.body.about, "about");
+            }
+            if (req.body.sexe)
+            {
+                let results = await queryUpdateFieldPromise(userId, req.body.sexe, "sexe");
+            }
+            if (req.body.first_name)
+            {
+                let results = await queryUpdateFieldPromise(userId, req.body.first_name, "first_name");
+            }
+            if (req.body.last_name)
+            {
+                let results = await queryUpdateFieldPromise(userId, req.body.last_name, "last_name");
+            }
+            // const results = await queryUpdateProfilePromise(userId, req.body.username, req.body.birthday, req.body.sexe, req.body.gender_interest, req.body.about);
+            // for (var i = 0; i < req.body.interests.length; i++)
+            // {
+            //     const interest_id = await queryGetInterestIdPromise(userId, req.body.interests[i]);
+            //     const user_interest = await queryInsertInterestPromise(userId, interest_id[i].id);
+                
+            // }
+            return res.status(201).json({
+                success: true,
+                message: 'Profile info added',
+            });
+        } catch (error) {
+            return res.status(500).send({
+                success: false,
+                error: error.message
+            });
+        }
+    },
     usernameExists: async function(req, res, next) {
         const query_res = await queryGetUserByUsername(req.params.username);
         var exists = false;
-        console.log(query_res, req.params.username)
+        // console.log(query_res, req.params.username)
         if (query_res.length > 0)
             exists = true;
         return res.status(200).json({
@@ -157,7 +326,7 @@ module.exports = {
     },
     getProfile: async function(req, res, next) {
         try {
-            console.log(req.body.username)
+            // console.log(req.body.username)
             const token = req.headers["x-access-token"];
             const decoded = jwt.verify(token, config.secret);  
             var userId = decoded.id;
@@ -168,7 +337,7 @@ module.exports = {
             // console.log("user_interest")
             return res.status(201).json({
                 success: true,
-                user: user,
+                user: user[0],
                 interests: interests
             });
         } catch (error) {
@@ -180,7 +349,7 @@ module.exports = {
     },
     postProfile: async function(req, res, next) {
         try {
-            console.log(req.body.username)
+            // console.log(req.body.username)
             const token = req.headers["x-access-token"];
             const decoded = jwt.verify(token, config.secret);  
             var userId = decoded.id;
@@ -190,8 +359,7 @@ module.exports = {
             for (var i = 0; i < req.body.interests.length; i++)
             {
                 const interest_id = await queryGetInterestIdPromise(userId, req.body.interests[i]);
-                const user_interest = await queryInsertInterestPromise(userId, interest_id[i].id);
-                
+                const user_interest = await queryInsertInterestPromise(userId, interest_id[0].id);
             }
             return res.status(201).json({
                 success: true,
@@ -208,7 +376,6 @@ module.exports = {
         
     },
     getUsers: async function(req, res, next) {
-        console.log("re");
         try {
             const results = await queryUsersPromise();
             return res.status(200).send({

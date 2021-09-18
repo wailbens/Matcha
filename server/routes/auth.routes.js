@@ -18,14 +18,41 @@ var registerValidate = [
 ];
 
 router.get(
-    '/users/:username/exist/',
+    '/users/:username/exists/',
     controller.usernameExists
+)
+
+router.get(
+    '/potentialmatches',
+    controller.getPotentialMatches
+)
+
+router.get(
+    '/matches/:interest',
+    controller.getByInterests
+)
+
+// router.post(
+//     'upload/',
+//     controller.uploadPics
+// )
+
+router.get(
+    '/profile/:id',
+    controller.isLoggedIn,
+    controller.getProfileById
 )
 
 router.get(
     '/profile',
     controller.isLoggedIn,
     controller.getProfile
+)
+
+router.put(
+    '/profile',
+    controller.isLoggedIn,
+    controller.updateProfile
 )
 
 router.post(
